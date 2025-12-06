@@ -1,0 +1,55 @@
+#include <Servo.h>
+#include <DHT.h>
+
+#define DHTPIN 2
+#define DHTTYPE DHT22
+
+DHT dht(DHTPIN, DHTTYPE);
+Servo fanServo;
+
+int servoPin = 6;
+int pos = 0; // 'pos' variable was declared but not used in original snippet
+int led = 7;
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  fanServo.attach(servoPin);
+  // pinMode(led, OUTPUT); // Added for completeness if you use the LED variable
+}
+
+void loop() {
+  float temperature = dht.readTemperature();
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.print(" *C");
+
+  int delayTime;
+
+  // Temperature-based servo speed control
+if (temperature < 25) {
+  delayTime = 50;  // Slow
+}
+else if (temperature < 30) {
+  delayTime = 20;  // Medium
+}
+else {
+  delayTime = 5;   // Fast
+}
+
+// Servo rotation simulation (fan motion)
+for (pos = 0; pos < 180; pos += 5) {
+  fanServo.write(pos);
+  delay(delayTime);
+}
+for (pos = 180; pos > 0; pos -= 5) {
+  fanServo.write(pos);
+  delay(delayTime);
+}
+
+// led blinking
+digitalWrite(led, HIGH);
+delay(2000);
+digitalWrite(led, LOW);
+delay(1000);
+}
